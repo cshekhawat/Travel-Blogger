@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+console.log("MM");
 mongoose.connect(process.env.DATABASE_URL, {
     useNewUrlParser: true,
     useCreateIndex: true,
