@@ -1,0 +1,7 @@
+<div class="book-grid">
+    <% books.forEach(book => { %>
+    <a href="/books/<%= book.id %>">
+        <img class="book-cover" src="<%= book.coverImagePath %>" />
+    </a>
+    <% }) %>
+</div>

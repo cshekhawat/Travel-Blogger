@@ -2,5 +2,41 @@
     <div class="book-site-background" data-aos="fade-up" data-aos-delay="100">
         <h3>Search Books!</h3>
         <h1>Your Destiny . Awaits Here</h1>
+
+        <form action="/books" method="GET">
+            <div class="form-element">
+                <input
+                    type="text"
+                    class="book-text"
+                    name="title"
+                    placeholder="Book Title"
+                    value="<%= searchOptions.title %>"
+                />
+            </div>
+            <div class="publish-wrap">
+                <div class="publish-date">
+                    <label class="publish-label">Published After</label>
+                    <input
+                        type="date"
+                        class="book-date"
+                        name="publishedAfter"
+                        placeholder="Published After"
+                        value="<%= searchOptions.publishedAfter %>"
+                    />
+                </div>
+                <div class="publish-date">
+                    <label class="publish-label">Published After</label>
+                    <input
+                        type="date"
+                        class="book-date"
+                        name="publishedBefore"
+                        placeholder="Published Before"
+                        value="<%= searchOptions.publishedBefore %>"
+                    />
+                </div>
+            </div>
+            <button type="submit" class="btn">Search Book</button>
+        </form>
     </div>
+    <%- include('../partials/bookGrid', { books: books }) %>
 </section>

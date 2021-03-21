@@ -24,6 +24,12 @@ body {
     --Josefin: "Josefin", cursive;
     --Lexend: "Lexend", cursive;
     --Livvic: "Livvic", cursive;
+    --book-cover-width: 140px;
+    --book-cover-width-large: 325px;
+    --book-cover-aspect-ratio: 0.75;
+    --book-cover-upload-width: 200px;
+    --book-cover-upload-width-large: 325px;
+    --book-cover-upload-aspect-ratio: 0.75;
 }
 
 /* ---------------- Global Classes ---------------*/
@@ -58,6 +64,7 @@ h3 {
 }
 input,
 textarea,
+label,
 select {
     font-family: var(--Abel);
 }
@@ -218,7 +225,7 @@ main .book-site-title {
     background: url("../assets/biblo.jfif");
     background-size: cover;
     height: 110vh;
-    display: flex;
+    /* display: flex; */
     justify-content: center;
 }
 
@@ -226,6 +233,7 @@ main .book-site-title .book-site-background {
     padding-top: 10rem;
     text-align: center;
     color: var(--white);
+    width: 100vw;
 }
 
 main .book-site-title .form-element {
@@ -268,6 +276,56 @@ main .book-site-title .book-desc {
     border-radius: 0.8rem;
     padding-left: 1rem;
     border: none;
+}
+
+main .book-site-title .book-cover {
+    margin-left: 4em;
+    width: var(--book-cover-width);
+    height: calc(var(--book-cover-width) / var(--book-cover-aspect-ratio));
+}
+
+main .book-site-title .book-cover-upload {
+    /* margin-left: 32.5rem; */
+    display: inline-block;
+    width: var(--book-cover-upload-width);
+    height: calc(
+        var(--book-cover-upload-width) / var(--book-cover-upload-aspect-ratio)
+    );
+}
+
+main .book-site-title .publish-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem 2rem;
+}
+
+main .book-site-title .publish-date {
+    display: flex;
+    flex-direction: column;
+}
+
+main .book-site-title .publish-label {
+    margin-right: auto;
+}
+
+main .book-site-title .book-grid {
+    margin: 0 2rem;
+    display: grid;
+    justify-content: center;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(auto-fill, var(--book-cover-width));
+}
+
+main
+    .book-site-title
+    .book-cover
+    .filepond--drop-label.filepond--drop-label
+    label {
+    padding: 1.5em;
+}
+
+main .book-site-title .book-cover-large {
+    --book-cover-width: var(--book-cover-width-large);
 }
 
 main .book-site-title .btn {

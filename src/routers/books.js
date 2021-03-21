@@ -5,21 +5,15 @@ const path = require("path");
 const sharp = require("sharp");
 const multer = require("multer");
 const router = new express.Router();
+const imageMimeTypes = [
+    "images/jpeg",
+    "images/png",
+    "images/gif",
+    "images/jfif"
+];
+/* ----- Use of Multer for file uploads
 
-// const imageMimeTypes = [
-//     "images/jpeg",
-//     "images/png",
-//     "images/gif",
-//     "images/jfif"
-// ];
 const staticAssets = path.join(__dirname, "../../public");
-// const upload = multer({
-//     dest: path.join(staticAssets, "pops"),
-//     fileFilter: (req, file, callback) => {
-//         callback(null, imageMimeTypes.includes(file.mimetype));
-//     }
-// });
-
 const upload = multer({
     //dest: path.join(staticAssets, "pops"),
     limits: {
@@ -32,12 +26,28 @@ const upload = multer({
         c(undefined, true);
     }
 });
+*/
 
 router.get("/", async (req, res) => {
+    let query = Book.find();
+    if (req.query.title != null && req.query.title != "") {
+        query = query.regex("title", new RegExp(req.query.title, "i"));
+    }
+    if (req.query.publishedBefore != null && req.query.publishedBefore != "") {
+        query = query.lte("publishDate", req.query.publishedBefore);
+    }
+    if (req.query.publishedAfter != null && req.query.publishedAfter != "") {
+        query = query.gte("publishDate", req.query.publishedAfter);
+    }
     try {
-        res.render("books");
-    } catch (e) {
-        res.status(500).send();
+        const books = await query.exec();
+        console.log(`BROOKS --- ${books}`);
+        res.render("books", {
+            books: books,
+            searchOptions: req.query
+        });
+    } catch {
+        res.redirect("/");
     }
 });
 
@@ -58,23 +68,23 @@ router.get("/new", async (req, res) => {
     renderNewPage(res, new Book());
 });
 
+// upload.single("cover"),
 router.post(
     "/",
-    upload.single("cover"),
     async (req, res) => {
-        const formatImage = await sharp(req.file.buffer)
-            .png()
-            .resize({ width: 398, height: 589 })
-            .toBuffer();
+        // const formatImage = await sharp(req.file.buffer)
+        //     .png()
+        //     .resize({ width: 398, height: 589 })
+        //     .toBuffer();
         const book = new Book({
             title: req.body.title,
             author: req.body.author,
             publishedDate: new Date(req.body.publishedDate),
             pageCount: req.body.pageCount,
-            description: req.body.description,
-            coverImage: formatImage
+            description: req.body.description
+            // coverImage: formatImage
         });
-        // saveCover(book, req.body.cover);
+        saveCover(book, req.body.cover);
         book.save((error, newBook) => {
             if (error) {
                 renderNewPage(res, book, true);
@@ -82,20 +92,21 @@ router.post(
                 res.redirect("books");
             }
         });
-
-        // try {
-        //     console.log(`byee -${book}`);
-        //     const newbook = await book.save();
-        //     console.log(`brass`);
-        //     res.redirect("books");
-        // } catch {
-        //     renderNewPage(res, book, true);
-        // }
     },
     (error, req, res, next) => {
         res.status(400).send({ error: error.message });
     }
 );
+
+const saveCover = async (book, coverEncoded) => {
+    if (coverEncoded == null) return;
+    const cover = JSON.parse(coverEncoded);
+    console.log(cover);
+    if (cover != null) {
+        book.coverImage = new Buffer.from(cover.data, "base64");
+        book.coverImageType = cover.type;
+    }
+};
 
 renderNewPage = async (res, book, hasError = false) => {
     try {
@@ -109,15 +120,5 @@ renderNewPage = async (res, book, hasError = false) => {
         res.redirect("/books");
     }
 };
-
-function saveCover(book, coverEncoded) {
-    if (coverEncoded == null) return;
-    console.log(coverEncoded);
-    //const cover = JSON.parse(coverEncoded);
-    if (cover != null && imageMimeTypes.includes(cover.type)) {
-        book.coverImage = new Buffer.from(cover.data, "base64");
-        book.coverImageType = cover.type;
-    }
-}
 
 module.exports = router;
