@@ -2,7 +2,7 @@
     <div class="book-site-background" data-aos="fade-up" data-aos-delay="100">
         <h3>Books Learning Anything!</h3>
         <h1>FOR FREE . FOR EVERYONE</h1>
-        <form action="/books" method="POST">
+        <form action="/books" method="POST" enctype="multipart/form-data">
             <div class="form-element">
                 <input type="text" name="title" class="book-text"
                 placeholder="Book Title" value = "<%= book.title %>"" />               

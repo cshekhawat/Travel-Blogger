@@ -56,7 +56,11 @@ h3 {
     font-family: var(--Abel);
     font-size: 1.3rem;
 }
-
+input,
+textarea,
+select {
+    font-family: var(--Abel);
+}
 button.btn {
     border: none;
     border-radius: 2rem;

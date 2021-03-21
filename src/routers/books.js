@@ -2,20 +2,34 @@ const express = require("express");
 const Book = require("../models/Book");
 const Author = require("../models/Author");
 const path = require("path");
+const sharp = require("sharp");
 const multer = require("multer");
 const router = new express.Router();
 
-const imageMimeTypes = [
-    "images/jpeg",
-    "images/png",
-    "images/gif",
-    "images/jfif"
-];
-//const staticAssets = path.join(__dirname, "../public");
+// const imageMimeTypes = [
+//     "images/jpeg",
+//     "images/png",
+//     "images/gif",
+//     "images/jfif"
+// ];
+const staticAssets = path.join(__dirname, "../../public");
+// const upload = multer({
+//     dest: path.join(staticAssets, "pops"),
+//     fileFilter: (req, file, callback) => {
+//         callback(null, imageMimeTypes.includes(file.mimetype));
+//     }
+// });
+
 const upload = multer({
-    dest: path.join("public", Book.coverImageBasePath),
-    fileFilter: (req, file, callback) => {
-        callback(null, imageMimeTypes.includes(file.mimetype));
+    //dest: path.join(staticAssets, "pops"),
+    limits: {
+        fileSize: 8000000
+    },
+    fileFilter(req, file, c) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|jfif|gif)$/)) {
+            return c(new Error("Pl upload image file only!!"));
+        }
+        c(undefined, true);
     }
 });
 
@@ -27,39 +41,61 @@ router.get("/", async (req, res) => {
     }
 });
 
+router.get("/:id/cover", async (req, res) => {
+    try {
+        const book = await Book.findById(req.params.id);
+        if (!book || !book.coverImage) {
+            throw new Error();
+        }
+        res.set("Content-Type", "image/png");
+        res.send(book.coverImage);
+    } catch (e) {
+        res.status(500).send();
+    }
+});
+
 router.get("/new", async (req, res) => {
     renderNewPage(res, new Book());
 });
 
-router.post("/", async (req, res) => {
-    //const filename = req.file != null ? req.file.filename : null;
-    const book = new Book({
-        title: req.body.title,
-        author: req.body.author,
-        publishedDate: new Date(req.body.publishedDate),
-        pageCount: req.body.pageCount,
-        description: req.body.description
-        // coverImageName: filename
-    });
-    // console.log(req.body.cover);
-    // saveCover(book, req.body.cover);
-    book.save((error, newBook) => {
-        if (error) {
-            renderNewPage(res, book, true);
-        } else {
-            res.redirect("books");
-        }
-    });
+router.post(
+    "/",
+    upload.single("cover"),
+    async (req, res) => {
+        const formatImage = await sharp(req.file.buffer)
+            .png()
+            .resize({ width: 398, height: 589 })
+            .toBuffer();
+        const book = new Book({
+            title: req.body.title,
+            author: req.body.author,
+            publishedDate: new Date(req.body.publishedDate),
+            pageCount: req.body.pageCount,
+            description: req.body.description,
+            coverImage: formatImage
+        });
+        // saveCover(book, req.body.cover);
+        book.save((error, newBook) => {
+            if (error) {
+                renderNewPage(res, book, true);
+            } else {
+                res.redirect("books");
+            }
+        });
 
-    // try {
-    //     console.log(`byee -${book}`);
-    //     const newbook = await book.save();
-    //     console.log(`brass`);
-    //     res.redirect("books");
-    // } catch {
-    //     renderNewPage(res, book, true);
-    // }
-});
+        // try {
+        //     console.log(`byee -${book}`);
+        //     const newbook = await book.save();
+        //     console.log(`brass`);
+        //     res.redirect("books");
+        // } catch {
+        //     renderNewPage(res, book, true);
+        // }
+    },
+    (error, req, res, next) => {
+        res.status(400).send({ error: error.message });
+    }
+);
 
 renderNewPage = async (res, book, hasError = false) => {
     try {
