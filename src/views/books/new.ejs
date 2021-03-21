@@ -1,0 +1,41 @@
+<section class="book-site-title">
+    <div class="book-site-background" data-aos="fade-up" data-aos-delay="100">
+        <h3>Books Learning Anything!</h3>
+        <h1>FOR FREE . FOR EVERYONE</h1>
+        <form action="/books" method="POST">
+            <div class="form-element">
+                <input type="text" name="title" class="book-text"
+                placeholder="Book Title" value = "<%= book.title %>"" />               
+            </div>            
+            <div>
+                    <select name = "author" class="book-author">
+                            <% authors.forEach(author => { %>
+                            <% if(author.id === book.author) { %>
+                                <option selected label="<%= author.name %>" value="<%= author.id %>">
+                                <% } else { %>
+                                <option label="<%= author.name %>" value="<%= author.id %>">
+                                <% } %>
+                            <% }) %>  
+                        </select>                
+            </div>
+            <div class="form-element">
+                    <input type="date" name="publishedDate" class="book-date"
+                    placeholder="Published Date" value = <%= book.publishedDate ==
+                    null ? '' : book.publishedDate.toISOString().split('T')[0] %> />   
+                    <input type="number" name="pageCount" class="book-date"
+                    placeholder="Page Count" min = "1" value = <%= book.pageCount %>
+                    />               
+            </div>
+ 
+            <div class="form-element">                
+                <textarea name="description" class="book-desc" placeholder="Book Description">
+ <%= book.description %> </textarea
+                >
+            </div>
+            <div class="form-element">
+                    <input type="file" name="cover" />
+            </div>
+            <button type="submit" class="btn">Register Book</button>
+        </form>
+    </div>
+</section>
